@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block title %}Game Analytics - Game Spending Tracker{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>
+            {% if viewing_child %}
+            <i class="fas fa-chart-pie me-2"></i>{{ viewing_name }} Game Analytics
+            {% else %}
+            <i class="fas fa-chart-pie me-2"></i>Game Analytics
+            {% endif %}
+        </h2>
+        <p class="text-muted">Understand your game spending patterns</p>
+    </div>
+
+    {% if child_accounts %}
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">View Child Account</h5>
+            </div>
+            <div class="card-body">
+                <form method="GET" action="{{ url_for('game_analytics') }}">
+                    <div class="input-group">
+                        <select class="form-select" name="child">
+                            <option value="">Your Account</option>
+                            {% for child in child_accounts %}
+                            <option value="{{ child.username }}" {% if request.args.get('child') == child.username %}selected{% endif %}>
+                                {{ child.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <button class="btn btn-primary" type="submit">View</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Statistics Overview -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card stats-card">
+            <i class="fas fa-money-bill-wave"></i>
+            <div class="stats-title">Total Game Spending</div>
+            <div class="stats-value">₹{{ "%.2f"|format(total_game_spent) }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stats-card">
+            <i class="fas fa-shopping-cart"></i>
+            <div class="stats-title">Purchases</div>
+            <div class="stats-value">{{ game_transaction_count }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stats-card">
+            <i class="fas fa-tags"></i>
+            <div class="stats-title">Average Purchase</div>
+            <div class="stats-value">₹{{ "%.2f"|format(avg_transaction) }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stats-card">
+            <i class="fas fa-ban"></i>
+            <div class="stats-title">Spending Limit</div>
+            <div class="stats-value">₹{{ "%.2f"|format(game_limit) }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row mb-4">
+    {% if charts.time %}
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Spending Over Time</h5>
+            </div>
+            <div class="card-body text-center">
+                <img src="{{ url_for('static', filename='charts/' + charts.time) }}" class="img-fluid" alt="Time Chart">
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0">Spending by Category</h5>
+            </div>
+            <div class="card-body">
+                {% if charts.category %}
+                <div class="text-center mb-3">
+                    <img src="{{ url_for('static', filename='charts/' + charts.category) }}" class="img-fluid" alt="Category Chart">
+                </div>
+                {% endif %}
+                
+                {% if category_data %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Amount</th>
+                                <th>%</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for category, data in category_data.items() %}
+                            <tr>
+                                <td>{{ category }}</td>
+                                <td>₹{{ "%.2f"|format(data.amount) }}</td>
+                                <td>{{ "%.1f"|format(data.percentage) }}%</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-center text-muted">No category data available</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0">Spending by Platform</h5>
+            </div>
+            <div class="card-body">
+                {% if charts.platform %}
+                <div class="text-center mb-3">
+                    <img src="{{ url_for('static', filename='charts/' + charts.platform) }}" class="img-fluid" alt="Platform Chart">
+                </div>
+                {% endif %}
+                
+                {% if platform_data %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Platform</th>
+                                <th>Amount</th>
+                                <th>%</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for platform, data in platform_data.items() %}
+                            <tr>
+                                <td>{{ platform }}</td>
+                                <td>₹{{ "%.2f"|format(data.amount) }}</td>
+                                <td>{{ "%.1f"|format(data.percentage) }}%</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-center text-muted">No platform data available</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Monthly Trend -->
+{% if monthly_trend %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Monthly Spending Trends</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Total Spent</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for month, amount in monthly_trend.items() %}
+                            <tr>
+                                <td>{{ month }}</td>
+                                <td>₹{{ "%.2f"|format(amount) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

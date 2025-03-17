@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Parent Approval - Game Spending Tracker{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2><i class="fas fa-check-circle me-2"></i>Parent Approval</h2>
+        <p class="text-muted">Review and approve game purchases</p>
+    </div>
+</div>
+
+{% if pending_transactions %}
+<div class="row">
+    <div class="col">
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Pending Approvals</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Account</th>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Amount</th>
+                                <th>Platform</th>
+                                <th>Category</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in pending_transactions %}
+                            <tr>
+                                <td>{{ item.user_display }}</td>
+                                <td>{{ item.transaction.date.split('T')[0] }}</td>
+                                <td>{{ item.transaction.description }}</td>
+                                <td class="fw-bold">₹{{ "%.2f"|format(item.transaction.amount) }}</td>
+                                <td>{{ item.transaction.game_platform }}</td>
+                                <td>{{ item.transaction.game_category }}</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ url_for('approve_transaction', username=item.username, transaction_id=item.transaction.id) }}" 
+                                           class="btn btn-success" title="Approve">
+                                            <i class="fas fa-check"></i>
+                                        </a>
+                                        <a href="{{ url_for('deny_transaction', username=item.username, transaction_id=item.transaction.id) }}" 
+                                           class="btn btn-danger" title="Deny">
+                                            <i class="fas fa-times"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-body text-center p-5">
+                <i class="fas fa-check-circle fa-4x text-success mb-3"></i>
+                <h4>No Pending Approvals</h4>
+                <p class="text-muted">There are no game purchases waiting for your approval at this time.</p>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-primary mt-2">
+                    <i class="fas fa-home me-1"></i>Return to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

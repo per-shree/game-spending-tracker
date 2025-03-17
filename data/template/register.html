@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Register - Game Spending Tracker{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-user-plus me-2"></i>Create Account</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('register') }}">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" required autofocus>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirm_password" class="form-label">Confirm Password</label>
+                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Account Type</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="account_type" id="parent_account" value="parent" checked>
+                            <label class="form-check-label" for="parent_account">
+                                Parent Account
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="account_type" id="child_account" value="child">
+                            <label class="form-check-label" for="child_account">
+                                Child Account
+                            </label>
+                        </div>
+                    </div>
+                    <div id="parent_username_field" class="mb-3 d-none">
+                        <label for="parent_username" class="form-label">Parent's Username</label>
+                        <input type="text" class="form-control" id="parent_username" name="parent_username">
+                        <div class="form-text">Enter the username of the parent account to link to</div>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Register</button>
+                    </div>
+                </form>
+                <hr>
+                <div class="text-center">
+                    <p class="mb-0">Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_scripts %}
+<script>
+    // Show/hide parent username field based on account type selection
+    document.addEventListener('DOMContentLoaded', function() {
+        const childAccountRadio = document.getElementById('child_account');
+        const parentAccountRadio = document.getElementById('parent_account');
+        const parentUsernameField = document.getElementById('parent_username_field');
+        
+        function updateParentField() {
+            if (childAccountRadio.checked) {
+                parentUsernameField.classList.remove('d-none');
+            } else {
+                parentUsernameField.classList.add('d-none');
+            }
+        }
+        
+        childAccountRadio.addEventListener('change', updateParentField);
+        parentAccountRadio.addEventListener('change', updateParentField);
+    });
+</script>
+{% endblock %}
+{% endblock %}

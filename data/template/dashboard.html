@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Game Spending Tracker{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2>Welcome, {{ profile.name or session.username }}</h2>
+        <p class="text-muted">
+            {% if is_child %}
+                Child Account
+            {% else %}
+                Parent Account
+            {% endif %}
+        </p>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{{ url_for('add_sample_data') }}" class="btn btn-outline-primary">
+            <i class="fas fa-plus-circle me-1"></i>Add Sample Data
+        </a>
+    </div>
+</div>
+
+<!-- Stats Overview -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card stats-card">
+            <i class="fas fa-wallet"></i>
+            <div class="stats-title">Current Balance</div>
+            <div class="stats-value">₹{{ "%.2f"|format(balance) }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stats-card">
+            <i class="fas fa-chart-line"></i>
+            <div class="stats-title">Total Spent</div>
+            <div class="stats-value">₹{{ "%.2f"|format(total_spent) }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stats-card">
+            <i class="fas fa-calendar-alt"></i>
+            <div class="stats-title">Monthly Spent</div>
+            <div class="stats-value">₹{{ "%.2f"|format(monthly_spent) }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stats-card">
+            <i class="fas fa-gamepad"></i>
+            <div class="stats-title">Game Limit</div>
+            <div class="stats-value">₹{{ "%.2f"|format(game_limit) }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- Budget Progress -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Monthly Budget</h5>
+                <div class="d-flex justify-content-between mb-1">
+                    <span>₹{{ "%.2f"|format(monthly_spent) }} spent</span>
+                    <span>₹{{ "%.2f"|format(profile.monthly_budget) }} budget</span>
+                </div>
+                <div class="progress budget-progress">
+                    <div class="progress-bar {% if budget_percent > 80 %}bg-danger{% elif budget_percent > 60 %}bg-warning{% else %}bg-success{% endif %}" 
+                         role="progressbar" 
+                         style="width: {{ budget_percent }}%;" 
+                         aria-valuenow="{{ budget_percent }}" 
+                         aria-valuemin="0" 
+                         aria-valuemax="100"></div>
+                </div>
+                <div class="text-end mt-1">
+                    <small class="text-muted">{{ "%.1f"|format(budget_percent) }}% of budget used</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Dashboard Content -->
+<div class="row">
+    <!-- Transactions Column -->
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Recent Transactions</h5>
+                <a href="{{ url_for('game_spending') }}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-plus me-1"></i>Add
+                </a>
+            </div>
+            <div class="card-body p-0">
+                {% if transactions %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaction in transactions %}
+                            <tr>
+                                <td>{{ transaction.date.split('T')[0] }}</td>
+                                <td>
+                                    {{ transaction.description }}
+                                    <br>
+                                    <small class="text-muted">{{ transaction.game_platform }}</small>
+                                </td>
+                                <td class="fw-bold">₹{{ "%.2f"|format(transaction.amount) }}</td>
+                                <td>
+                                    {% if transaction.approved_by_parent %}
+                                    <span class="badge bg-success">Approved</span>
+                                    {% else %}
+                                    <span class="badge bg-warning">Pending</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="p-4 text-center">
+                    <p class="text-muted">No transactions yet</p>
+                    <a href="{{ url_for('game_spending') }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-plus me-1"></i>Add First Transaction
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Gaming Tip -->
+        <div class="card tip-card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-lightbulb me-2 text-warning"></i>Gaming Tip</h5>
+                <p class="card-text">{{ gaming_tip }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Column -->
+    <div class="col-md-6">
+        {% if charts %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Spending by Category</h5>
+            </div>
+            <div class="card-body text-center">
+                {% if charts.category %}
+                <img src="{{ url_for('static', filename='charts/' + charts.category) }}" class="img-fluid" alt="Category Chart">
+                {% else %}
+                <p class="text-muted">Not enough data for category chart</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Spending by Platform</h5>
+            </div>
+            <div class="card-body text-center">
+                {% if charts.platform %}
+                <img src="{{ url_for('static', filename='charts/' + charts.platform) }}" class="img-fluid" alt="Platform Chart">
+                {% else %}
+                <p class="text-muted">Not enough data for platform chart</p>
+                {% endif %}
+            </div>
+        </div>
+        {% else %}
+        <div class="card">
+            <div class="card-body text-center p-5">
+                <i class="fas fa-chart-pie fa-4x text-muted mb-3"></i>
+                <h5>No Charts Available</h5>
+                <p class="text-muted">Add game purchases to see spending analytics</p>
+                <a href="{{ url_for('game_spending') }}" class="btn btn-primary mt-2">
+                    <i class="fas fa-plus me-1"></i>Record Game Purchase
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

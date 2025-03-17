@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Record Game Spending - Game Spending Tracker{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-gamepad me-2"></i>Record Game Purchase</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('game_spending') }}">
+                    <!-- Amount -->
+                    <div class="mb-3">
+                        <label for="amount" class="form-label">Amount (₹)</label>
+                        <input type="number" step="0.01" min="0.01" class="form-control" id="amount" name="amount" required>
+                    </div>
+                    
+                    <!-- Description -->
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <input type="text" class="form-control" id="description" name="description" placeholder="e.g., Minecraft Subscription" required>
+                    </div>
+                    
+                    <div class="row">
+                        <!-- Game Platform -->
+                        <div class="col-md-6 mb-3">
+                            <label for="game_platform" class="form-label">Game Platform</label>
+                            <select class="form-select" id="game_platform" name="game_platform" required>
+                                <option value="" disabled selected>Select platform</option>
+                                {% for platform in game_platforms %}
+                                <option value="{{ platform }}">{{ platform }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- Game Category -->
+                        <div class="col-md-6 mb-3">
+                            <label for="game_category" class="form-label">Game Category</label>
+                            <select class="form-select" id="game_category" name="game_category" required>
+                                <option value="" disabled selected>Select category</option>
+                                {% for category in game_categories %}
+                                <option value="{{ category }}">{{ category }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    {% if needs_approval %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        This purchase will require parent approval before it's finalized.
+                    </div>
+                    {% endif %}
+
+                    {% if profile.game_spending_limit > 0 %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Your monthly game spending limit is ₹{{ "%.2f"|format(profile.game_spending_limit) }}.
+                    </div>
+                    {% endif %}
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Record Purchase
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

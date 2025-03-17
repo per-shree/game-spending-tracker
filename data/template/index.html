@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Game Spending Tracker - Welcome{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card border-0 rounded-3 shadow-lg overflow-hidden">
+            <div class="card-body p-0">
+                <div class="row g-0">
+                    <div class="col-md-6 d-none d-md-block">
+                        <div class="bg-primary text-white p-5 h-100 d-flex flex-column justify-content-center">
+                            <h2 class="fw-bold mb-4">Game Spending Tracker</h2>
+                            <p class="lead mb-4">Monitor and control gaming expenses for your family</p>
+                            <ul class="list-unstyled mb-4">
+                                <li class="mb-2">
+                                    <i class="fas fa-check-circle me-2"></i>Track game purchases
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check-circle me-2"></i>Set spending limits
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check-circle me-2"></i>Approve children's purchases
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check-circle me-2"></i>Visualize spending patterns
+                                </li>
+                            </ul>
+                            <p>Take control of your family's gaming budget today!</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-5">
+                            <div class="text-center">
+                                <h1 class="h4 text-gray-900 mb-4">Welcome to Game Spending Tracker</h1>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col-md-6">
+                                    <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg btn-block w-100 mb-3">
+                                        <i class="fas fa-sign-in-alt me-2"></i>Login
+                                    </a>
+                                </div>
+                                <div class="col-md-6">
+                                    <a href="{{ url_for('register') }}" class="btn btn-outline-primary btn-lg btn-block w-100 mb-3">
+                                        <i class="fas fa-user-plus me-2"></i>Register
+                                    </a>
+                                </div>
+                            </div>
+                            <hr class="my-4">
+                            <div class="text-center">
+                                <h4 class="h5 mb-3">Demo Account</h4>
+                                <p class="small">To explore the app quickly, register a new account and then click "Add Sample Data" from your dashboard.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
